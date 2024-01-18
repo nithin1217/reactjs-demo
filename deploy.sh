@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-docker run -p 80:80 nithin2023/reactjs:dev
+docker run -p 80:80 nithin2023/reactprojectprod-1:dev
 
 if [ $? -eq 0 ]; then
   echo "Docker container started successfully on the server"
