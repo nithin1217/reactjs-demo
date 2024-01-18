@@ -1,6 +1,6 @@
 #!/bin/bash
 
-docker build -t nithin2023/reactjs-demo:latest .
+docker build -t nithin2023/reactjs:prod .
 
 
 if [ $? -eq 0 ]; then
