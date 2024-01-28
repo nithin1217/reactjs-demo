@@ -1,4 +1,4 @@
-FROM node:12.2.0-alpine
+FROM node:20.11.0-alpine3.18
 
 WORKDIR /usr/src/app
 
@@ -10,7 +10,7 @@ RUN npm run test
 
 COPY . .
 
-EXPOSE 80
+EXPOSE 3000
 
-CMD ["node", "app.js"]
+CMD ["npm", "start"]
 
