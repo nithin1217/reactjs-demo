@@ -1,4 +1,4 @@
-FROM node:16
+FROM node:21.6.1
 
 WORKDIR /usr/src/app
 
@@ -10,7 +10,7 @@ RUN npm run test
 
 COPY . .
 
-EXPOSE 3000
+EXPOSE 80
 
 CMD ["npm", "start"]
 
