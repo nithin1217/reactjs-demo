@@ -1,11 +1,5 @@
 #!/bin/bash
 
+docker pull nithin2023/reactjs:dev
 
-docker run -p 80:80 nithin2023/reactprojectprod-1:dev
-
-if [ $? -eq 0 ]; then
-  echo "Docker container started successfully on the server"
-else
-  echo "Failed to start Docker container on the server"
-  exit 1
-fi
+docker run -d --name node-todo-app-container2 -p 80:3000 nithin2023/reactjs:dev
