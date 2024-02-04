@@ -4,4 +4,4 @@ docker pull nithin2023/reactjs:dev
 
 #docker run -d --name container2 -p 80:3000 reactjs-demo
 
-docker run -d --name container2 -p 80:3000 nithin2023/reactjs:dev
+docker run -d -p 80:3000 nithin2023/reactjs:dev
