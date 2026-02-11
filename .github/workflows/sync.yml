@@ -3,7 +3,7 @@ name: Sync
 on:
   push:
     branches:
-      - develop
+      - main
 
 jobs:
   sync:
@@ -31,4 +31,4 @@ jobs:
           git add -A
           git commit -m "Sync from GitHub (develop): ${GITHUB_SHA}" || echo "No changes to commit"
 
-          git push customer HEAD:develop --force
+          git push customer HEAD:main --force
