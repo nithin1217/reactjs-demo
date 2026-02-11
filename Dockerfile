@@ -1,15 +1,20 @@
-FROM node:21.6.1
+# ---------- Stage 1 : Node app ----------
+FROM node:21.6.1 AS app
 
-WORKDIR src/index
-
+WORKDIR /app
 COPY package*.json ./
-
 RUN npm install
-
 COPY . .
 
-EXPOSE 80
+# ---------- Stage 2 : Nginx ----------
+FROM nginx:alpine
 
-CMD ["npm", "start"]
+RUN apk add --no-cache nodejs npm
 
-#added
+WORKDIR /app
+COPY --from=app /app /app
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 8080
+
+CMD sh -c "npm start & nginx -g 'daemon off;'"
