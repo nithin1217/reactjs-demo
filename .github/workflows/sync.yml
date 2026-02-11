@@ -25,10 +25,18 @@ jobs:
           GITLAB_USERNAME: ${{ secrets.GITLAB_USERNAME }}
           GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
         run: |
-          # Add GitLab remote with token auth
-          git remote add customer "https://${GITLAB_USERNAME}:${GITLAB_TOKEN}@${GITLAB_REPO_URL#https://}"
-
+          git checkout --orphan snapshot-branch
+          git rm -rf .
+          
+          # Copy current files back
+          git checkout main -- .
+          
+          # Commit as company
           git add -A
-          git commit -m "Sync from GitHub (develop): ${GITHUB_SHA}" || echo "No changes to commit"
-
-          git push customer HEAD:develop --force
+          git commit -m "Sync from GitHub: ${GITHUB_SHA}"
+          
+          # Add GitLab remote
+          git remote add customer "https://${GITLAB_USERNAME}:${GITLAB_TOKEN}@${GITLAB_REPO_URL#https://}"
+          
+          # Force overwrite GitLab branch
+          git push customer snapshot-branch:develop --force
