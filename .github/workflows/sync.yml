@@ -16,8 +16,8 @@ jobs:
 
       - name: identity
         run: |
-          git config user.name "paulin"
-          git config user.email "paulin.duerwald@METAPOTT.com"
+          git config user.name "nithin"
+          git config user.email "nithinkumar7059@gmail.com"
 
       - name: Push snapshot to Customer GitLab (develop)
         env:
