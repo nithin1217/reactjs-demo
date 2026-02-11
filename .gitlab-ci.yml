@@ -1,0 +1,70 @@
+stages:
+  - build
+  - deploy
+
+# -------------------------
+# GLOBAL VARIABLES (edit here only)
+# -------------------------
+variables:
+  # GCP
+  GCP_PROJECT_ID: "project-36306fc0-f733-4dd3-8b7"
+  GCP_REGION: "europe-west1"          # example: europe-west1 / europe-west3 (Frankfurt)
+  CLOUDRUN_SERVICE: "gaeb-frontend"   # Cloud Run service name
+
+  # Artifact Registry
+  AR_REPO: "app-repo"                 # Artifact Registry repository name (Docker format)
+  IMAGE_NAME: "frontend"              # image name inside repo
+
+  # Docker build
+  DOCKERFILE_PATH: "frontend/Dockerfile"
+  BUILD_CONTEXT: "frontend"
+
+  # Container port inside your image (nginx listens on this)
+  CONTAINER_PORT: "8080"
+
+  # Full image path (do not change)
+  IMAGE: "$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$AR_REPO/$IMAGE_NAME:$CI_COMMIT_SHA"
+
+workflow:
+  rules:
+    - if: $CI_COMMIT_BRANCH == "develop"
+    - if: $CI_PIPELINE_SOURCE == "push"
+    - when: never
+
+build_and_push:
+  stage: build
+  image: google/cloud-sdk:slim
+  services:
+    - docker:dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+  before_script:
+    # 1) Auth to GCP using Service Account JSON key stored in GitLab variable GCP_SA_KEY_B64
+    - echo "$GCP_SA_KEY_B64" | base64 -d > /tmp/gcp-key.json
+    - gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
+    - gcloud config set project "$GCP_PROJECT_ID"
+
+    # 2) Configure Docker to push to Artifact Registry
+    - gcloud auth configure-docker "$GCP_REGION-docker.pkg.dev" -q
+  script:
+    # 3) Build + push image
+    - docker build -t "$IMAGE" -f "$DOCKERFILE_PATH" "$BUILD_CONTEXT"
+    - docker push "$IMAGE"
+
+deploy_cloudrun:
+  stage: deploy
+  image: google/cloud-sdk:slim
+  needs: ["build_and_push"]
+  before_script:
+    - echo "$GCP_SA_KEY_B64" | base64 -d > /tmp/gcp-key.json
+    - gcloud auth activate-service-account --key-file=/tmp/gcp-key.json
+    - gcloud config set project "$GCP_PROJECT_ID"
+  script:
+    # 4) Deploy to Cloud Run
+    - gcloud run deploy "$CLOUDRUN_SERVICE" \
+        --image "$IMAGE" \
+        --region "$GCP_REGION" \
+        --platform managed \
+        --allow-unauthenticated \
+        --port "$CONTAINER_PORT"
