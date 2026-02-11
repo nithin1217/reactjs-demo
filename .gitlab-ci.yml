@@ -2,6 +2,10 @@ stages:
   - build
   - deploy
 
+image: docker:24.0.5
+
+services:
+  - docker:24.0.5-dind
 # -------------------------
 # GLOBAL VARIABLES (edit here only)
 # -------------------------
@@ -16,7 +20,7 @@ variables:
   IMAGE_NAME: "frontend"              # image name inside repo
 
   # Docker build
-  DOCKERFILE_PATH: "frontend/Dockerfile"
+  DOCKERFILE_PATH: "./Dockerfile"
   BUILD_CONTEXT: "frontend"
 
   # Container port inside your image (nginx listens on this)
