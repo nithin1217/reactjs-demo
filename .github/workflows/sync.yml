@@ -30,6 +30,8 @@ jobs:
           
           # Copy current files back
           git checkout main -- .
+
+          rm -rf .github
           
           # Commit as company
           git add -A
